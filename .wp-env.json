@@ -1,0 +1,14 @@
+{
+  "core": "WordPress/WordPress#6.4",
+  "phpVersion": "8.0",
+  "plugins": [
+    "./botvisibility"
+  ],
+  "config": {
+    "WP_DEBUG": true,
+    "SCRIPT_DEBUG": true
+  },
+  "mappings": {
+    "wp-content/plugins/botvisibility-wp": "."
+  }
+}

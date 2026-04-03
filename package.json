@@ -1,0 +1,13 @@
+{
+  "name": "botvisibility-wp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BotVisibility WordPress Plugin",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@wordpress/env": "^10.0.0"
+  },
+  "scripts": {
+    "wp-env": "wp-env"
+  }
+}

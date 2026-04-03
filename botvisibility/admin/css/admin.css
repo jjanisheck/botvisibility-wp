@@ -1,0 +1,1516 @@
+/**
+ * BotVisibility WordPress Admin — Dark Theme
+ * Matches botvisibility.com visual identity
+ *
+ * All rules scoped under .botvisibility-admin to prevent
+ * bleeding into the WordPress admin chrome.
+ */
+
+/* ==========================================================================
+   DESIGN TOKENS (CSS Custom Properties)
+   ========================================================================== */
+
+.botvisibility-admin {
+  --bv-bg-deep: #0a0a0a;
+  --bv-bg-surface: #111111;
+  --bv-bg-elevated: #161616;
+  --bv-bg-input: #0d0d0d;
+
+  --bv-border: #1a1a1a;
+  --bv-border-subtle: #222222;
+  --bv-border-hover: #333333;
+
+  --bv-text-primary: rgba(255, 255, 255, 0.9);
+  --bv-text-secondary: rgba(255, 255, 255, 0.7);
+  --bv-text-tertiary: rgba(255, 255, 255, 0.5);
+  --bv-text-muted: rgba(255, 255, 255, 0.4);
+
+  --bv-level-l1: #ef4444;
+  --bv-level-l2: #f59e0b;
+  --bv-level-l3: #22c55e;
+  --bv-level-l4: #8b5cf6;
+  --bv-blue: #2563eb;
+  --bv-purple: #7c3aed;
+
+  --bv-gradient-thermometer: linear-gradient(90deg, #ef4444, #f59e0b, #eab308, #22c55e, #2563eb);
+  --bv-gradient-score: linear-gradient(135deg, #ef4444, #f59e0b, #22c55e, #2563eb);
+  --bv-gradient-primary: linear-gradient(135deg, #2563eb, #7c3aed);
+
+  --bv-font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bv-font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --bv-radius-sm: 6px;
+  --bv-radius-md: 8px;
+  --bv-radius-lg: 12px;
+  --bv-radius-xl: 16px;
+  --bv-radius-thermometer: 14px;
+
+  --bv-transition-fast: 150ms ease-out;
+  --bv-transition-base: 200ms ease-out;
+  --bv-transition-slow: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  --bv-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --bv-shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --bv-shadow-glow-blue: 0 0 20px rgba(37, 99, 235, 0.15);
+  --bv-shadow-glow-white: 0 0 8px rgba(255, 255, 255, 0.6);
+
+  --bv-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.3);
+}
+
+
+/* ==========================================================================
+   CONTAINER — Reset WP admin styles inside plugin scope
+   ========================================================================== */
+
+.botvisibility-admin {
+  box-sizing: border-box;
+  background: var(--bv-bg-deep);
+  color: var(--bv-text-primary);
+  font-family: var(--bv-font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.botvisibility-admin *,
+.botvisibility-admin *::before,
+.botvisibility-admin *::after {
+  box-sizing: border-box;
+}
+
+/* Override common WP admin styles within our scope */
+.botvisibility-admin h1,
+.botvisibility-admin h2,
+.botvisibility-admin h3,
+.botvisibility-admin h4,
+.botvisibility-admin h5,
+.botvisibility-admin h6 {
+  color: var(--bv-text-primary);
+  font-family: var(--bv-font-body);
+  margin: 0 0 0.5em;
+  padding: 0;
+  line-height: 1.3;
+}
+
+.botvisibility-admin p {
+  color: var(--bv-text-secondary);
+  margin: 0 0 1em;
+}
+
+.botvisibility-admin a {
+  color: var(--bv-blue);
+  text-decoration: none;
+  transition: color var(--bv-transition-fast);
+}
+
+.botvisibility-admin a:hover {
+  color: #3b82f6;
+}
+
+.botvisibility-admin code {
+  font-family: var(--bv-font-mono);
+  font-size: 0.875em;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: var(--bv-radius-sm);
+}
+
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.botvis-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 24px 32px 0;
+  background: var(--bv-bg-deep);
+  border-bottom: 1px solid var(--bv-border);
+}
+
+.botvis-logo-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 20px;
+}
+
+.botvis-logo-area img,
+.botvis-logo-area svg {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.botvis-logo-area h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+
+/* ==========================================================================
+   TABS — Primary navigation
+   ========================================================================== */
+
+.botvis-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.botvis-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bv-text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--bv-transition-fast), border-color var(--bv-transition-fast);
+  font-family: inherit;
+}
+
+.botvis-tab:hover {
+  color: var(--bv-text-secondary);
+}
+
+.botvis-tab.active {
+  color: var(--bv-text-primary);
+  border-bottom-color: var(--bv-blue);
+}
+
+.botvis-tab .dashicons,
+.botvis-tab svg {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+
+/* ==========================================================================
+   SUB-TABS — L1/L2/L3 secondary navigation
+   ========================================================================== */
+
+.botvis-sub-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 0;
+  margin: 0 0 16px;
+  list-style: none;
+  border-bottom: 1px solid var(--bv-border);
+}
+
+.botvis-sub-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bv-text-muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--bv-radius-md);
+  cursor: pointer;
+  transition: all var(--bv-transition-fast);
+  font-family: inherit;
+}
+
+.botvis-sub-tab:hover {
+  color: var(--bv-text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.botvis-sub-tab.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--bv-border-hover);
+}
+
+.botvis-sub-tab[data-level="l1"] { --dot-color: var(--bv-level-l1); }
+.botvis-sub-tab[data-level="l2"] { --dot-color: var(--bv-level-l2); }
+.botvis-sub-tab[data-level="l3"] { --dot-color: var(--bv-level-l3); }
+
+.botvis-sub-tab[data-level]::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dot-color, var(--bv-text-muted));
+}
+
+
+/* ==========================================================================
+   CONTENT AREA
+   ========================================================================== */
+
+.botvis-content {
+  padding: 24px 32px 48px;
+  max-width: 1200px;
+}
+
+
+/* ==========================================================================
+   DASHBOARD
+   ========================================================================== */
+
+.botvis-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- Score Header --- */
+
+.botvis-score-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px;
+  background: var(--bv-bg-surface);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-xl);
+}
+
+.botvis-level-name {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.botvis-level-name[data-level="l1"] { color: var(--bv-level-l1); }
+.botvis-level-name[data-level="l2"] { color: var(--bv-level-l2); }
+.botvis-level-name[data-level="l3"] { color: var(--bv-level-l3); }
+
+.botvis-level-desc {
+  font-size: 13px;
+  color: var(--bv-text-muted);
+  margin: 0;
+  max-width: 400px;
+}
+
+.botvis-score-number {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.botvis-score-value {
+  font-family: var(--bv-font-mono);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  background: var(--bv-gradient-score);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.botvis-score-total {
+  font-family: var(--bv-font-mono);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--bv-text-muted);
+}
+
+.botvis-score-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--bv-text-muted);
+  margin-top: 4px;
+}
+
+
+/* --- Thermometer --- */
+
+.botvis-thermometer {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--bv-radius-thermometer);
+  overflow: visible;
+}
+
+.botvis-thermometer-fill {
+  height: 100%;
+  border-radius: var(--bv-radius-thermometer);
+  background: var(--bv-gradient-thermometer);
+  transition: width 1.5s ease;
+  min-width: 4px;
+}
+
+.botvis-thermometer-needle {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 36px;
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: var(--bv-shadow-glow-white);
+  transition: left 1.5s ease;
+  transform: translateX(-50%);
+}
+
+
+/* --- Level Progress Bars --- */
+
+.botvis-level-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  background: var(--bv-bg-surface);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-xl);
+}
+
+.botvis-level-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.botvis-level-bar-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.botvis-level-bar-label .level-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.botvis-level-bar-label .level-count {
+  color: var(--bv-text-tertiary);
+  font-weight: 400;
+  font-family: var(--bv-font-mono);
+  font-size: 12px;
+}
+
+.botvis-level-bar[data-level="l1"] .level-name { color: var(--bv-level-l1); }
+.botvis-level-bar[data-level="l2"] .level-name { color: var(--bv-level-l2); }
+.botvis-level-bar[data-level="l3"] .level-name { color: var(--bv-level-l3); }
+
+.botvis-progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--bv-radius-thermometer);
+  overflow: hidden;
+}
+
+.botvis-progress-fill {
+  height: 100%;
+  border-radius: var(--bv-radius-thermometer);
+  transition: width 1s ease;
+  min-width: 0;
+}
+
+.botvis-level-bar[data-level="l1"] .botvis-progress-fill { background: var(--bv-level-l1); }
+.botvis-level-bar[data-level="l2"] .botvis-progress-fill { background: var(--bv-level-l2); }
+.botvis-level-bar[data-level="l3"] .botvis-progress-fill { background: var(--bv-level-l3); }
+
+
+/* --- Scan Meta / Timestamp --- */
+
+.botvis-scan-meta {
+  font-size: 12px;
+  color: var(--bv-text-muted);
+  text-align: right;
+  padding: 4px 0;
+}
+
+
+/* --- Empty State --- */
+
+.botvis-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 64px 32px;
+  gap: 16px;
+}
+
+.botvis-empty-state .dashicons,
+.botvis-empty-state svg {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: var(--bv-text-muted);
+  opacity: 0.5;
+}
+
+.botvis-empty-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.botvis-empty-state p {
+  font-size: 14px;
+  color: var(--bv-text-muted);
+  max-width: 400px;
+  margin: 0;
+}
+
+
+/* --- Actions Row --- */
+
+.botvis-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+
+/* --- Badge Embed --- */
+
+.botvis-badge-embed {
+  padding: 20px;
+  background: var(--bv-bg-surface);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-xl);
+}
+
+.botvis-badge-embed h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.botvis-embed-code {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  font-family: var(--bv-font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--bv-text-secondary);
+  background: var(--bv-bg-input);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-md);
+  overflow-x: auto;
+  white-space: pre;
+  word-break: break-all;
+}
+
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+.botvis-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-family: var(--bv-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--bv-text-primary);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-md);
+  cursor: pointer;
+  transition: all var(--bv-transition-fast);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.botvis-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--bv-border-hover);
+  color: #fff;
+}
+
+.botvis-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--bv-focus-ring);
+}
+
+.botvis-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.botvis-btn .dashicons,
+.botvis-btn svg {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Primary Button */
+.botvis-btn-primary {
+  color: #ffffff;
+  background: var(--bv-gradient-primary);
+  border-color: transparent;
+}
+
+.botvis-btn-primary:hover {
+  filter: brightness(1.15);
+  box-shadow: var(--bv-shadow-glow-blue);
+  color: #ffffff;
+}
+
+/* Secondary Button */
+.botvis-btn-secondary {
+  color: var(--bv-text-secondary);
+  background: transparent;
+  border-color: var(--bv-border-subtle);
+}
+
+.botvis-btn-secondary:hover {
+  color: var(--bv-text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--bv-border-hover);
+}
+
+/* Fix Button */
+.botvis-btn-fix {
+  color: #ffffff;
+  background: var(--bv-level-l3);
+  border-color: transparent;
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+.botvis-btn-fix:hover {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+/* Small Button */
+.botvis-btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+
+/* ==========================================================================
+   CHECK ITEMS (Scan Results)
+   ========================================================================== */
+
+.botvis-check-item {
+  background: var(--bv-bg-surface);
+  border: 1px solid var(--bv-border);
+  border-left-width: 4px;
+  border-radius: var(--bv-radius-lg);
+  margin-bottom: 8px;
+  overflow: hidden;
+  animation: botvis-slide-in 0.3s ease both;
+}
+
+.botvis-check-item:nth-child(1) { animation-delay: 0.02s; }
+.botvis-check-item:nth-child(2) { animation-delay: 0.04s; }
+.botvis-check-item:nth-child(3) { animation-delay: 0.06s; }
+.botvis-check-item:nth-child(4) { animation-delay: 0.08s; }
+.botvis-check-item:nth-child(5) { animation-delay: 0.10s; }
+.botvis-check-item:nth-child(6) { animation-delay: 0.12s; }
+.botvis-check-item:nth-child(7) { animation-delay: 0.14s; }
+.botvis-check-item:nth-child(8) { animation-delay: 0.16s; }
+.botvis-check-item:nth-child(9) { animation-delay: 0.18s; }
+.botvis-check-item:nth-child(10) { animation-delay: 0.20s; }
+
+/* Status Variants — left border color */
+.botvis-check-item.botvis-status-pass {
+  border-left-color: var(--bv-level-l3);
+}
+
+.botvis-check-item.botvis-status-fail {
+  border-left-color: var(--bv-level-l1);
+}
+
+.botvis-check-item.botvis-status-partial {
+  border-left-color: var(--bv-level-l2);
+}
+
+.botvis-check-item.botvis-status-na {
+  border-left-color: var(--bv-border);
+  opacity: 0.55;
+}
+
+/* Check Header (clickable row) */
+.botvis-check-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--bv-transition-fast);
+}
+
+.botvis-check-header:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Status Icon */
+.botvis-check-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.botvis-check-status-icon::before {
+  display: block;
+  text-align: center;
+  font-weight: 700;
+}
+
+.botvis-check-status-icon[data-status="pass"] {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--bv-level-l3);
+}
+.botvis-check-status-icon[data-status="pass"]::before {
+  content: '\2713';
+}
+
+.botvis-check-status-icon[data-status="fail"] {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--bv-level-l1);
+}
+.botvis-check-status-icon[data-status="fail"]::before {
+  content: '\2717';
+}
+
+.botvis-check-status-icon[data-status="partial"] {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--bv-level-l2);
+}
+.botvis-check-status-icon[data-status="partial"]::before {
+  content: '\2022';
+  font-size: 18px;
+}
+
+.botvis-check-status-icon[data-status="na"] {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--bv-text-muted);
+}
+.botvis-check-status-icon[data-status="na"]::before {
+  content: '\2014';
+}
+
+/* Check ID */
+.botvis-check-id {
+  font-family: var(--bv-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bv-text-muted);
+  flex-shrink: 0;
+  min-width: 36px;
+}
+
+/* Check Name */
+.botvis-check-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bv-text-primary);
+  line-height: 1.4;
+}
+
+/* Caret */
+.botvis-check-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--bv-text-muted);
+  transition: transform var(--bv-transition-base);
+}
+
+.botvis-check-caret::after {
+  content: '';
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  margin-top: -3px;
+}
+
+.botvis-check-item.expanded .botvis-check-caret {
+  transform: rotate(180deg);
+}
+
+/* Check Details (expandable) */
+.botvis-check-details {
+  display: none;
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--bv-border);
+}
+
+.botvis-check-item.expanded .botvis-check-details {
+  display: block;
+}
+
+.botvis-check-desc {
+  font-size: 13px;
+  color: var(--bv-text-secondary);
+  margin: 12px 0 8px;
+  line-height: 1.6;
+}
+
+.botvis-check-message {
+  font-size: 13px;
+  color: var(--bv-text-primary);
+  margin: 8px 0;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--bv-radius-sm);
+  border-left: 3px solid var(--bv-border-subtle);
+}
+
+.botvis-check-detail-text {
+  font-family: var(--bv-font-mono);
+  font-size: 12px;
+  color: var(--bv-text-tertiary);
+  margin: 8px 0;
+  padding: 10px 12px;
+  background: var(--bv-bg-input);
+  border-radius: var(--bv-radius-sm);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.botvis-check-recommendation {
+  font-size: 13px;
+  color: var(--bv-text-secondary);
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  border-radius: var(--bv-radius-md);
+  line-height: 1.6;
+}
+
+.botvis-check-recommendation strong {
+  color: var(--bv-text-primary);
+}
+
+
+/* ==========================================================================
+   FILE MANAGER
+   ========================================================================== */
+
+.botvis-file-manager {
+  overflow-x: auto;
+}
+
+.botvis-file-actions-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.botvis-file-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bv-bg-surface);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-lg);
+  overflow: hidden;
+}
+
+.botvis-file-table th {
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bv-text-muted);
+  text-align: left;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--bv-border);
+}
+
+.botvis-file-table td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--bv-text-secondary);
+  border-bottom: 1px solid var(--bv-border);
+  vertical-align: middle;
+}
+
+.botvis-file-table tr:last-child td {
+  border-bottom: none;
+}
+
+.botvis-file-table tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.botvis-file-name {
+  font-weight: 600;
+  color: var(--bv-text-primary);
+}
+
+.botvis-file-path {
+  font-family: var(--bv-font-mono);
+  font-size: 12px;
+  color: var(--bv-text-tertiary);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 8px;
+  border-radius: var(--bv-radius-sm);
+}
+
+/* File Status Badges */
+.botvis-file-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: var(--bv-radius-sm);
+}
+
+.botvis-file-status-badge.botvis-file-virtual {
+  color: var(--bv-level-l3);
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.botvis-file-status-badge.botvis-file-static {
+  color: var(--bv-blue);
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.botvis-file-status-badge.botvis-file-disabled {
+  color: var(--bv-text-muted);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Row variants */
+.botvis-file-table tr.botvis-file-virtual td {
+  /* no special override; uses default row */
+}
+
+.botvis-file-table tr.botvis-file-static td {
+  /* no special override; uses default row */
+}
+
+.botvis-file-table tr.botvis-file-disabled td {
+  opacity: 0.5;
+}
+
+/* Toggle Switch (CSS-only) */
+.botvis-toggle {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.botvis-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.botvis-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background var(--bv-transition-base);
+}
+
+.botvis-toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 3px;
+  bottom: 3px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform var(--bv-transition-base);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.botvis-toggle input:checked + .botvis-toggle-slider {
+  background: var(--bv-level-l3);
+}
+
+.botvis-toggle input:checked + .botvis-toggle-slider::before {
+  transform: translateX(18px);
+}
+
+.botvis-toggle input:focus-visible + .botvis-toggle-slider {
+  box-shadow: var(--bv-focus-ring);
+}
+
+
+/* ==========================================================================
+   MODAL
+   ========================================================================== */
+
+.botvis-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  animation: botvis-fade-in 0.2s ease;
+}
+
+.botvis-modal-content {
+  width: 100%;
+  max-width: 700px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bv-bg-surface);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-xl);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  animation: botvis-scale-in 0.25s ease;
+}
+
+.botvis-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--bv-border);
+}
+
+.botvis-modal-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.botvis-modal-header .botvis-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 18px;
+  color: var(--bv-text-muted);
+  background: none;
+  border: none;
+  border-radius: var(--bv-radius-sm);
+  cursor: pointer;
+  transition: all var(--bv-transition-fast);
+}
+
+.botvis-modal-header .botvis-modal-close:hover {
+  color: var(--bv-text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.botvis-modal-body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.botvis-modal-editor {
+  display: block;
+  width: 100%;
+  min-height: 300px;
+  padding: 16px;
+  font-family: var(--bv-font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--bv-text-primary);
+  background: var(--bv-bg-input);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-md);
+  resize: vertical;
+  tab-size: 2;
+}
+
+.botvis-modal-editor:focus {
+  outline: none;
+  border-color: var(--bv-blue);
+  box-shadow: var(--bv-focus-ring);
+}
+
+.botvis-modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px 24px;
+  border-top: 1px solid var(--bv-border);
+}
+
+
+/* ==========================================================================
+   SETTINGS
+   ========================================================================== */
+
+.botvis-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 720px;
+}
+
+.botvis-setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--bv-border);
+}
+
+.botvis-setting-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.botvis-setting-group h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.botvis-setting-desc {
+  font-size: 13px;
+  color: var(--bv-text-muted);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+/* Textarea */
+.botvis-textarea {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+  font-family: var(--bv-font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--bv-text-primary);
+  background: var(--bv-bg-input);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-md);
+  resize: vertical;
+}
+
+.botvis-textarea:focus {
+  outline: none;
+  border-color: var(--bv-blue);
+  box-shadow: var(--bv-focus-ring);
+}
+
+/* Select */
+.botvis-select {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  padding: 10px 36px 10px 14px;
+  font-family: var(--bv-font-body);
+  font-size: 13px;
+  color: var(--bv-text-primary);
+  background: var(--bv-bg-input);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-md);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.5)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11.4L2.3 5.7l1.4-1.4L8 8.6l4.3-4.3 1.4 1.4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+}
+
+.botvis-select:focus {
+  outline: none;
+  border-color: var(--bv-blue);
+  box-shadow: var(--bv-focus-ring);
+}
+
+/* Checkboxes */
+.botvis-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.botvis-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--bv-text-secondary);
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: var(--bv-radius-sm);
+  transition: background var(--bv-transition-fast);
+}
+
+.botvis-checkbox-label:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.botvis-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--bv-blue);
+  flex-shrink: 0;
+}
+
+/* Switch Label */
+.botvis-switch-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+}
+
+.botvis-switch-label .switch-text {
+  flex: 1;
+}
+
+.botvis-switch-label .switch-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bv-text-primary);
+  margin-bottom: 2px;
+}
+
+.botvis-switch-label .switch-desc {
+  font-size: 12px;
+  color: var(--bv-text-muted);
+  line-height: 1.4;
+}
+
+/* Setting Actions */
+.botvis-setting-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+
+/* ==========================================================================
+   SPINNER
+   ========================================================================== */
+
+.botvis-spinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--bv-blue);
+  border-radius: 50%;
+  animation: botvis-spin 0.8s linear infinite;
+}
+
+.botvis-spinner.botvis-spinner-sm {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.botvis-scanning-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bv-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+
+@keyframes botvis-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes botvis-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes botvis-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes botvis-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes botvis-confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(-10px) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(120vh) rotate(720deg);
+  }
+}
+
+
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+
+.botvisibility-admin .text-l1 { color: var(--bv-level-l1); }
+.botvisibility-admin .text-l2 { color: var(--bv-level-l2); }
+.botvisibility-admin .text-l3 { color: var(--bv-level-l3); }
+.botvisibility-admin .text-muted { color: var(--bv-text-muted); }
+.botvisibility-admin .text-mono { font-family: var(--bv-font-mono); }
+.botvisibility-admin .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — Mobile / Small Screens
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .botvis-header {
+    padding: 16px 16px 0;
+  }
+
+  .botvis-content {
+    padding: 16px 16px 32px;
+  }
+
+  .botvis-score-header {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .botvis-score-number {
+    text-align: left;
+  }
+
+  .botvis-score-value {
+    font-size: 40px;
+  }
+
+  .botvis-level-name {
+    font-size: 22px;
+  }
+
+  .botvis-tabs {
+    gap: 0;
+  }
+
+  .botvis-tab {
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+
+  .botvis-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .botvis-btn {
+    justify-content: center;
+  }
+
+  .botvis-checkboxes {
+    grid-template-columns: 1fr;
+  }
+
+  .botvis-modal-content {
+    margin: 16px;
+    max-height: calc(100vh - 32px);
+  }
+
+  .botvis-file-table {
+    font-size: 12px;
+  }
+
+  .botvis-file-table th,
+  .botvis-file-table td {
+    padding: 8px 10px;
+  }
+
+  .botvis-level-bars {
+    padding: 16px;
+  }
+
+  .botvis-badge-embed {
+    padding: 14px;
+  }
+
+  .botvis-embed-code {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .botvis-logo-area h1 {
+    font-size: 16px;
+  }
+
+  .botvis-score-value {
+    font-size: 32px;
+  }
+
+  .botvis-check-header {
+    padding: 10px 12px;
+  }
+
+  .botvis-check-name {
+    font-size: 13px;
+  }
+
+  .botvis-sub-tabs {
+    flex-wrap: wrap;
+  }
+}
+
+/* ==========================================================================
+   LEVEL 4: AGENT-NATIVE
+   ========================================================================== */
+
+.botvis-agent-native-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--bv-border);
+}
+
+.botvis-badge-achieved {
+  display: inline-block;
+  background: var(--bv-level-l4);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--bv-radius-sm);
+  margin-left: 8px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.botvis-btn-enable {
+  background: var(--bv-level-l4);
+  color: #fff;
+  border: none;
+  padding: 6px 16px;
+  border-radius: var(--bv-radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background var(--bv-transition-fast);
+}
+
+.botvis-btn-enable:hover {
+  background: #7c3aed;
+}
+
+.botvis-btn-disable {
+  background: transparent;
+  color: var(--bv-text-secondary);
+  border: 1px solid var(--bv-border);
+  padding: 6px 16px;
+  border-radius: var(--bv-radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--bv-transition-fast);
+}
+
+.botvis-btn-disable:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.botvis-check-item[data-check-id^="4."] .botvis-check-header {
+  border-left: 3px solid var(--bv-level-l4);
+}
+
+.botvis-sub-tab:nth-child(4).active {
+  border-color: var(--bv-level-l4) !important;
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<phpunit
+    bootstrap="tests/bootstrap.php"
+    backupGlobals="false"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+>
+    <testsuites>
+        <testsuite name="core">
+            <file>tests/test-scoring.php</file>
+            <file>tests/test-scanner.php</file>
+            <file>tests/test-file-generator.php</file>
+            <file>tests/test-virtual-routes.php</file>
+            <file>tests/test-meta-tags.php</file>
+            <file>tests/test-rest-enhancer.php</file>
+            <file>tests/test-openapi-generator.php</file>
+        </testsuite>
+        <testsuite name="agent-native">
+            <file>tests/test-scanner-l4.php</file>
+            <file>tests/test-agent-db.php</file>
+            <file>tests/test-agent-infrastructure.php</file>
+            <file>tests/test-intent-endpoints.php</file>
+            <file>tests/test-sessions.php</file>
+            <file>tests/test-scoped-tokens.php</file>
+            <file>tests/test-audit-logs.php</file>
+            <file>tests/test-sandbox.php</file>
+            <file>tests/test-tool-schemas.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>
