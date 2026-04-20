@@ -21,7 +21,7 @@ Suites are defined in `phpunit.xml.dist` at the repository root.
 | File | What it tests |
 |---|---|
 | `test-scoring.php` | Level calculation logic, progressive thresholds, N/A exclusion |
-| `test-scanner.php` | All 37 check definitions, pass/partial/fail/N/A results |
+| `test-scanner.php` | All 43 check definitions, pass/partial/fail/N/A results |
 | `test-file-generator.php` | `llms.txt`, `agent-card.json`, `ai.json`, `skill.md`, and other discovery file content |
 | `test-virtual-routes.php` | WordPress rewrite rules and virtual file serving |
 | `test-meta-tags.php` | HTML `<meta>` and `<link>` tag output for AI discovery |

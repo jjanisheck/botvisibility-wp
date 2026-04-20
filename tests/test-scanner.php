@@ -8,9 +8,9 @@ class Test_Scanner extends BotVis_Test_Case {
     //  Basic scanner output
     // ──────────────────────────────────────────────────────────────
 
-    public function test_run_all_checks_returns_37_results() {
+    public function test_run_all_checks_returns_43_results() {
         $result = BotVisibility_Scanner::run_all_checks();
-        $this->assertCount( 37, $result['checks'] );
+        $this->assertCount( 43, $result['checks'] );
     }
 
     public function test_result_array_has_required_fields() {
