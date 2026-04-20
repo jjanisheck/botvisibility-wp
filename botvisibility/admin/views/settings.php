@@ -59,6 +59,73 @@ $selected_caps = $options['capabilities'] ?? array( 'content' );
                 <input type="checkbox" name="enable_idempotency" value="1" <?php checked( ! empty( $options['enable_idempotency'] ) ); ?>>
                 <span>Idempotency Support</span> <small>Accept Idempotency-Key header</small>
             </label>
+
+            <label class="botvis-switch-label">
+                <input type="checkbox" name="enable_markdown_for_agents" value="1" <?php checked( ! empty( $options['enable_markdown_for_agents'] ) ); ?>>
+                <span>Markdown for Agents</span> <small>Serve posts/pages as markdown when <code>Accept: text/markdown</code></small>
+            </label>
+
+            <label class="botvis-switch-label">
+                <input type="checkbox" name="enable_webmcp" value="1" <?php checked( ! empty( $options['enable_webmcp'] ) ); ?>>
+                <span>WebMCP</span> <small>Expose in-browser tools via <code>navigator.modelContext.provideContext()</code> on the homepage</small>
+            </label>
+        </div>
+
+        <div class="botvis-setting-group">
+            <h3>Content Signals</h3>
+            <p class="botvis-setting-desc">Declare AI content usage preferences in robots.txt (<a href="https://contentsignals.org" target="_blank" rel="noopener">contentsignals.org</a>).</p>
+            <?php
+            $cs          = $options['content_signals'] ?? array();
+            $signal_keys = array(
+                'search'   => 'Search crawlers',
+                'ai-train' => 'AI training',
+                'ai-input' => 'AI input / grounding',
+            );
+            foreach ( $signal_keys as $skey => $label ) :
+                $val = $cs[ $skey ] ?? '';
+            ?>
+                <div class="botvis-content-signal-row" style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <label style="flex:1;"><?php echo esc_html( $label ); ?> <code><?php echo esc_html( $skey ); ?></code></label>
+                    <select name="content_signals[<?php echo esc_attr( $skey ); ?>]" class="botvis-select" style="max-width:160px;">
+                        <option value=""    <?php selected( $val, '' ); ?>>Unset</option>
+                        <option value="yes" <?php selected( $val, 'yes' ); ?>>Allow (yes)</option>
+                        <option value="no"  <?php selected( $val, 'no' ); ?>>Deny (no)</option>
+                    </select>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="botvis-setting-group">
+            <h3>x402 Payments</h3>
+            <p class="botvis-setting-desc">Expose a gated endpoint at <code>/wp-json/botvisibility/v1/paid-preview</code> that returns HTTP 402 with machine-readable payment requirements. This advertises the x402 surface to agents; it does not perform on-chain verification.</p>
+            <?php $x402 = $options['x402'] ?? array(); ?>
+            <label class="botvis-switch-label">
+                <input type="checkbox" name="x402[enabled]" value="1" <?php checked( ! empty( $x402['enabled'] ) ); ?>>
+                <span>Enable x402 endpoint</span>
+            </label>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+                <label>
+                    <span>Network</span>
+                    <input type="text" name="x402[network]" value="<?php echo esc_attr( $x402['network'] ?? 'base-sepolia' ); ?>" class="botvis-input" />
+                </label>
+                <label>
+                    <span>Asset</span>
+                    <input type="text" name="x402[asset]" value="<?php echo esc_attr( $x402['asset'] ?? 'USDC' ); ?>" class="botvis-input" />
+                </label>
+                <label>
+                    <span>Pay-to address</span>
+                    <input type="text" name="x402[pay_to]" value="<?php echo esc_attr( $x402['pay_to'] ?? '' ); ?>" class="botvis-input" placeholder="0x..." />
+                </label>
+                <label>
+                    <span>Max amount (atomic)</span>
+                    <input type="text" name="x402[max_amount_required]" value="<?php echo esc_attr( $x402['max_amount_required'] ?? '10000' ); ?>" class="botvis-input" />
+                </label>
+                <label style="grid-column:1/-1;">
+                    <span>Resource description</span>
+                    <input type="text" name="x402[resource_description]" value="<?php echo esc_attr( $x402['resource_description'] ?? 'Premium preview access' ); ?>" class="botvis-input" />
+                </label>
+            </div>
         </div>
 
         <div class="botvis-setting-group">

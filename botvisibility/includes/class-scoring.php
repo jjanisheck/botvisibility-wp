@@ -36,10 +36,10 @@ class BotVisibility_Scoring {
     );
 
     /**
-     * All 37 check definitions.
+     * All 43 check definitions.
      */
     const CHECK_DEFINITIONS = array(
-        // Level 1: Discoverable (14)
+        // Level 1: Discoverable (18)
         array( 'id' => '1.1',  'name' => 'llms.txt',                  'level' => 1, 'category' => 'Discoverable', 'description' => 'A /.well-known/llms.txt or /llms.txt file exists with machine-readable site information.' ),
         array( 'id' => '1.2',  'name' => 'Agent Card',                'level' => 1, 'category' => 'Discoverable', 'description' => 'An agent card (/.well-known/agent-card.json) describes capabilities for AI agents.' ),
         array( 'id' => '1.3',  'name' => 'OpenAPI Spec',              'level' => 1, 'category' => 'Discoverable', 'description' => 'An OpenAPI/Swagger specification is publicly accessible.' ),
@@ -54,8 +54,12 @@ class BotVisibility_Scoring {
         array( 'id' => '1.12', 'name' => 'MCP Server',                'level' => 1, 'category' => 'Discoverable', 'description' => 'A Model Context Protocol server endpoint is discoverable at /.well-known/mcp.json.' ),
         array( 'id' => '1.13', 'name' => 'Page Token Efficiency',     'level' => 1, 'category' => 'Discoverable', 'description' => 'The homepage HTML is token-efficient for LLM consumption.' ),
         array( 'id' => '1.14', 'name' => 'RSS/Atom Feed',             'level' => 1, 'category' => 'Discoverable', 'description' => 'An RSS or Atom feed provides structured content for agents.' ),
+        array( 'id' => '1.15', 'name' => 'Content Signals',           'level' => 1, 'category' => 'Discoverable', 'description' => 'robots.txt declares AI content usage preferences via Content-Signal directive (search, ai-train, ai-input).' ),
+        array( 'id' => '1.16', 'name' => 'API Catalog',               'level' => 1, 'category' => 'Discoverable', 'description' => 'A /.well-known/api-catalog endpoint returns an RFC 9727 linkset pointing to service-desc, service-doc, and status.' ),
+        array( 'id' => '1.17', 'name' => 'Markdown for Agents',       'level' => 1, 'category' => 'Discoverable', 'description' => 'Requests with Accept: text/markdown return a markdown rendering of the page.' ),
+        array( 'id' => '1.18', 'name' => 'WebMCP',                    'level' => 1, 'category' => 'Discoverable', 'description' => 'The homepage calls navigator.modelContext.provideContext() to expose in-browser tools to AI agents.' ),
 
-        // Level 2: Usable (9)
+        // Level 2: Usable (11)
         array( 'id' => '2.1', 'name' => 'API Read Operations',       'level' => 2, 'category' => 'Usable', 'description' => 'Read operations (list, get, search) are available via API.' ),
         array( 'id' => '2.2', 'name' => 'API Write Operations',      'level' => 2, 'category' => 'Usable', 'description' => 'Write operations (create, update, delete) are available via API.' ),
         array( 'id' => '2.3', 'name' => 'API Primary Action',        'level' => 2, 'category' => 'Usable', 'description' => 'The primary value action of the app is available via API.' ),
@@ -65,6 +69,8 @@ class BotVisibility_Scoring {
         array( 'id' => '2.7', 'name' => 'Structured Error Responses', 'level' => 2, 'category' => 'Usable', 'description' => 'All API errors return structured JSON with error codes.' ),
         array( 'id' => '2.8', 'name' => 'Async Operations',          'level' => 2, 'category' => 'Usable', 'description' => 'Long-running operations return a job ID with pollable status.' ),
         array( 'id' => '2.9', 'name' => 'Idempotency Support',       'level' => 2, 'category' => 'Usable', 'description' => 'Write endpoints support idempotency keys.' ),
+        array( 'id' => '2.10', 'name' => 'OAuth Protected Resource', 'level' => 2, 'category' => 'Usable', 'description' => 'A /.well-known/oauth-protected-resource document advertises authorization servers and scopes (RFC 9728).' ),
+        array( 'id' => '2.11', 'name' => 'x402 Payments',            'level' => 2, 'category' => 'Usable', 'description' => 'API endpoints support the x402 agent-native payment protocol — a protected route returns HTTP 402 with machine-readable payment requirements.' ),
 
         // Level 3: Optimized (7)
         array( 'id' => '3.1', 'name' => 'Sparse Fields',             'level' => 3, 'category' => 'Optimized', 'description' => 'A fields parameter exists to request only needed fields.' ),

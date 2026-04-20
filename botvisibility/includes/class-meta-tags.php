@@ -67,5 +67,96 @@ class BotVisibility_Meta_Tags {
         }
 
         echo "<!-- /BotVisibility -->\n";
+
+        self::maybe_output_webmcp_script();
+    }
+
+    /**
+     * WebMCP (check 1.18): inject a script on the front page that exposes
+     * in-browser tools via navigator.modelContext.provideContext().
+     */
+    private static function maybe_output_webmcp_script() {
+        $options = get_option( 'botvisibility_options', array() );
+
+        if ( empty( $options['enable_webmcp'] ) ) {
+            return;
+        }
+
+        if ( ! is_front_page() && ! is_home() ) {
+            return;
+        }
+
+        $tools = self::build_webmcp_tools();
+        if ( empty( $tools ) ) {
+            return;
+        }
+
+        $payload = wp_json_encode(
+            array( 'tools' => $tools ),
+            JSON_UNESCAPED_SLASHES
+        );
+
+        echo "\n<!-- BotVisibility: WebMCP -->\n";
+        echo "<script type=\"application/javascript\">\n";
+        printf(
+            "(function(){if(typeof navigator!=='undefined'&&navigator.modelContext&&typeof navigator.modelContext.provideContext==='function'){try{navigator.modelContext.provideContext(%s);}catch(e){}}})();\n",
+            $payload
+        );
+        echo "</script>\n";
+        echo "<!-- /BotVisibility WebMCP -->\n";
+    }
+
+    /**
+     * Build a minimal WebMCP tools list derived from the site's REST API surface.
+     *
+     * @return array
+     */
+    private static function build_webmcp_tools() {
+        $api_root = esc_url_raw( rest_url() );
+
+        $tools = array(
+            array(
+                'name'        => 'search_content',
+                'description' => 'Search posts on this WordPress site.',
+                'input_schema' => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'query' => array( 'type' => 'string', 'description' => 'Search query string.' ),
+                        'per_page' => array( 'type' => 'integer', 'default' => 10 ),
+                    ),
+                    'required' => array( 'query' ),
+                ),
+                'endpoint' => $api_root . 'wp/v2/search',
+                'method'   => 'GET',
+            ),
+            array(
+                'name'        => 'list_posts',
+                'description' => 'List recent posts with pagination.',
+                'input_schema' => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'per_page' => array( 'type' => 'integer', 'default' => 10, 'maximum' => 100 ),
+                        'page'     => array( 'type' => 'integer', 'default' => 1 ),
+                    ),
+                ),
+                'endpoint' => $api_root . 'wp/v2/posts',
+                'method'   => 'GET',
+            ),
+            array(
+                'name'        => 'get_post',
+                'description' => 'Retrieve a single post by ID.',
+                'input_schema' => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'id' => array( 'type' => 'integer', 'description' => 'Post ID.' ),
+                    ),
+                    'required' => array( 'id' ),
+                ),
+                'endpoint' => $api_root . 'wp/v2/posts/{id}',
+                'method'   => 'GET',
+            ),
+        );
+
+        return $tools;
     }
 }

@@ -4,13 +4,15 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 $enabled_files = $options['enabled_files'] ?? array();
 
 $files = array(
-    'llms-txt'     => array( 'name' => 'llms.txt',               'path' => '/llms.txt',                         'type' => 'text/plain' ),
-    'agent-card'   => array( 'name' => 'Agent Card',             'path' => '/.well-known/agent-card.json',      'type' => 'application/json' ),
-    'ai-json'      => array( 'name' => 'AI Site Profile',        'path' => '/.well-known/ai.json',              'type' => 'application/json' ),
-    'skill-md'     => array( 'name' => 'Skill File',             'path' => '/skill.md',                         'type' => 'text/markdown' ),
-    'skills-index' => array( 'name' => 'Skills Index',           'path' => '/.well-known/skills/index.json',    'type' => 'application/json' ),
-    'openapi'      => array( 'name' => 'OpenAPI Spec',           'path' => '/openapi.json',                     'type' => 'application/json' ),
-    'mcp-json'     => array( 'name' => 'MCP Manifest',           'path' => '/.well-known/mcp.json',             'type' => 'application/json' ),
+    'llms-txt'       => array( 'name' => 'llms.txt',                  'path' => '/llms.txt',                             'type' => 'text/plain' ),
+    'agent-card'     => array( 'name' => 'Agent Card',                'path' => '/.well-known/agent-card.json',          'type' => 'application/json' ),
+    'ai-json'        => array( 'name' => 'AI Site Profile',           'path' => '/.well-known/ai.json',                  'type' => 'application/json' ),
+    'skill-md'       => array( 'name' => 'Skill File',                'path' => '/skill.md',                             'type' => 'text/markdown' ),
+    'skills-index'   => array( 'name' => 'Skills Index',              'path' => '/.well-known/skills/index.json',        'type' => 'application/json' ),
+    'openapi'        => array( 'name' => 'OpenAPI Spec',              'path' => '/openapi.json',                         'type' => 'application/json' ),
+    'mcp-json'       => array( 'name' => 'MCP Manifest',              'path' => '/.well-known/mcp.json',                 'type' => 'application/json' ),
+    'api-catalog'    => array( 'name' => 'API Catalog',               'path' => '/.well-known/api-catalog',              'type' => 'application/linkset+json' ),
+    'oauth-resource' => array( 'name' => 'OAuth Protected Resource',  'path' => '/.well-known/oauth-protected-resource', 'type' => 'application/json' ),
 );
 ?>
 

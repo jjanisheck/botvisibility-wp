@@ -169,7 +169,13 @@ class BotVisibility_Admin {
             '1.10' => array( 'file' => 'skills-index' ),
             '1.11' => array( 'meta_tags' => true ),
             '1.12' => array( 'file' => 'mcp-json' ),
+            '1.15' => array( 'content_signals_default' => true ),
+            '1.16' => array( 'file' => 'api-catalog' ),
+            '1.17' => array( 'setting' => 'enable_markdown_for_agents', 'value' => true ),
+            '1.18' => array( 'setting' => 'enable_webmcp', 'value' => true ),
             '2.9'  => array( 'setting' => 'enable_idempotency', 'value' => true ),
+            '2.10' => array( 'file' => 'oauth-resource' ),
+            '2.11' => array( 'x402_enable' => true ),
             '3.5'  => array( 'setting' => 'enable_rate_limits', 'value' => true ),
             '3.6'  => array( 'setting' => 'enable_cache_headers', 'value' => true ),
             '4.1' => array( 'feature' => 'intent_endpoints' ),
@@ -205,6 +211,25 @@ class BotVisibility_Admin {
             }
         }
 
+        if ( ! empty( $fix['content_signals_default'] ) ) {
+            $options['content_signals'] = array(
+                'search'   => 'yes',
+                'ai-train' => 'no',
+                'ai-input' => 'yes',
+            );
+        }
+
+        if ( ! empty( $fix['x402_enable'] ) ) {
+            if ( ! isset( $options['x402'] ) || ! is_array( $options['x402'] ) ) {
+                $options['x402'] = array();
+            }
+            $options['x402']['enabled'] = true;
+            if ( empty( $options['x402']['network'] ) )              $options['x402']['network']              = 'base-sepolia';
+            if ( empty( $options['x402']['asset'] ) )                $options['x402']['asset']                = 'USDC';
+            if ( empty( $options['x402']['max_amount_required'] ) )  $options['x402']['max_amount_required']  = '10000';
+            if ( empty( $options['x402']['resource_description'] ) ) $options['x402']['resource_description'] = 'Premium preview access';
+        }
+
         update_option( 'botvisibility_options', $options );
 
         // Flush rewrite rules if we enabled new files.
@@ -228,13 +253,15 @@ class BotVisibility_Admin {
 
         // Enable all files.
         $options['enabled_files'] = array(
-            'llms-txt'     => true,
-            'agent-card'   => true,
-            'ai-json'      => true,
-            'skill-md'     => true,
-            'skills-index' => true,
-            'openapi'      => true,
-            'mcp-json'     => true,
+            'llms-txt'        => true,
+            'agent-card'      => true,
+            'ai-json'         => true,
+            'skill-md'        => true,
+            'skills-index'    => true,
+            'openapi'         => true,
+            'mcp-json'        => true,
+            'api-catalog'     => true,
+            'oauth-resource'  => true,
         );
 
         // Enable all REST enhancements.
@@ -243,6 +270,17 @@ class BotVisibility_Admin {
         $options['enable_rate_limits']   = true;
         $options['enable_idempotency']   = true;
         $options['robots_ai_policy']     = 'allow';
+
+        // Enable new discoverable/usable checks.
+        $options['enable_markdown_for_agents'] = true;
+        $options['enable_webmcp']              = true;
+        $options['content_signals']            = array(
+            'search'   => 'yes',
+            'ai-train' => 'no',
+            'ai-input' => 'yes',
+        );
+
+        // Leave x402 off unless already configured — it needs a recipient address.
 
         // Enable all agent features.
         $include_l4 = ! empty( $_POST['include_l4'] );
@@ -354,6 +392,41 @@ class BotVisibility_Admin {
         }
         if ( isset( $_POST['remove_files_on_deactivate'] ) ) {
             $options['remove_files_on_deactivate'] = (bool) $_POST['remove_files_on_deactivate'];
+        }
+
+        // Content Signals (1.15).
+        if ( isset( $_POST['content_signals'] ) && is_array( $_POST['content_signals'] ) ) {
+            $allowed = array( 'yes', 'no', '' );
+            $clean   = array();
+            foreach ( array( 'search', 'ai-train', 'ai-input' ) as $key ) {
+                $v = $_POST['content_signals'][ $key ] ?? '';
+                $v = sanitize_key( $v );
+                $clean[ $key ] = in_array( $v, $allowed, true ) ? $v : '';
+            }
+            $options['content_signals'] = $clean;
+        }
+
+        // Markdown for Agents (1.17).
+        $options['enable_markdown_for_agents'] = ! empty( $_POST['enable_markdown_for_agents'] );
+
+        // WebMCP (1.18).
+        $options['enable_webmcp'] = ! empty( $_POST['enable_webmcp'] );
+
+        // x402 Payments (2.11).
+        if ( isset( $_POST['x402'] ) && is_array( $_POST['x402'] ) ) {
+            $x402 = $options['x402'] ?? array();
+            $x402['enabled']              = ! empty( $_POST['x402']['enabled'] );
+            $x402['network']              = sanitize_text_field( $_POST['x402']['network'] ?? 'base-sepolia' );
+            $x402['asset']                = sanitize_text_field( $_POST['x402']['asset'] ?? 'USDC' );
+            $x402['pay_to']               = sanitize_text_field( $_POST['x402']['pay_to'] ?? '' );
+            $x402['max_amount_required']  = sanitize_text_field( $_POST['x402']['max_amount_required'] ?? '10000' );
+            $x402['resource_description'] = sanitize_text_field( $_POST['x402']['resource_description'] ?? '' );
+            $options['x402'] = $x402;
+        } else {
+            if ( ! isset( $options['x402'] ) || ! is_array( $options['x402'] ) ) {
+                $options['x402'] = array();
+            }
+            $options['x402']['enabled'] = false;
         }
 
         if ( isset( $_POST['agent_features'] ) && is_array( $_POST['agent_features'] ) ) {

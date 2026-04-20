@@ -9,7 +9,7 @@
 
 ---
 
-BotVisibility scans your site against the [37-item BotVisibility Checklist](https://botvisibility.com), identifies gaps, and fixes them — with your permission.
+BotVisibility scans your site against the [43-item BotVisibility Checklist](https://botvisibility.com), identifies gaps, and fixes them — with your permission.
 
 ## What It Does
 
@@ -17,14 +17,14 @@ AI agents (ChatGPT, Claude, Copilot, custom GPTs, MCP clients) need machine-read
 
 **Scan** your site to see what's missing. **Fix** issues with one click. **Generate** the discovery files that agents need. **Enable** agent-native infrastructure when you're ready to go further.
 
-## The 37-Item Checklist
+## The 43-Item Checklist
 
 BotVisibility tests your site across 4 levels:
 
 | Level | Name | Checks | What It Means |
 |-------|------|--------|---------------|
-| 1 | **Discoverable** | 14 | Bots can find you. Metadata, machine-readable files, and structured data are in place. |
-| 2 | **Usable** | 9 | Your API works for agents. Auth, errors, and core operations are agent-compatible. |
+| 1 | **Discoverable** | 18 | Bots can find you. Metadata, machine-readable files, and structured data are in place. |
+| 2 | **Usable** | 11 | Your API works for agents. Auth, errors, and core operations are agent-compatible. |
 | 3 | **Optimized** | 7 | Agents work efficiently. Pagination, filtering, and caching reduce token waste. |
 | 4 | **Agent-Native** | 7 | First-class agent support. Intent endpoints, sessions, scoped tokens, and tool schemas. |
 
@@ -33,7 +33,7 @@ Levels 1-3 are scored progressively. Level 4 (Agent-Native) is scored independen
 ## Features
 
 ### Automated Scanning
-- Runs all 37 checks against your live site
+- Runs all 43 checks against your live site
 - Scheduled weekly auto-scans with email alerts on level changes
 - Detailed pass/partial/fail/N/A results with actionable recommendations
 
@@ -54,6 +54,8 @@ Auto-generates and serves these files dynamically (no disk writes required):
 | `skills-index.json` | `/.well-known/skills/index.json` | Index of available agent skills |
 | `openapi.json` | `/openapi.json` | Auto-generated OpenAPI spec from your REST API |
 | `mcp.json` | `/.well-known/mcp.json` | Model Context Protocol server manifest |
+| `api-catalog` | `/.well-known/api-catalog` | RFC 9727 linkset pointing to service-desc, service-doc, and status |
+| `oauth-protected-resource` | `/.well-known/oauth-protected-resource` | RFC 9728 document advertising authorization servers and scopes |
 
 Files can also be exported to static disk locations. Custom content editing is supported for all files.
 
@@ -63,6 +65,10 @@ Optional enhancements toggled in settings:
 - **Rate limit headers** (`X-RateLimit-*`) with transient-backed tracking
 - **Cache headers** (`ETag`, `Cache-Control`, `Last-Modified`)
 - **Idempotency support** via `Idempotency-Key` header
+- **Markdown for Agents** — serves posts/pages as markdown when the request sends `Accept: text/markdown`
+- **WebMCP** — injects `navigator.modelContext.provideContext()` on the homepage with tool definitions derived from your REST API
+- **Content Signals** — appends a `Content-Signal:` directive to `robots.txt` ([contentsignals.org](https://contentsignals.org))
+- **x402 Payments** — exposes a gated endpoint at `/wp-json/botvisibility/v1/paid-preview` that returns HTTP 402 with machine-readable payment requirements
 
 ### Agent-Native Infrastructure (Level 4)
 Opt-in features that add real agent infrastructure to your site:

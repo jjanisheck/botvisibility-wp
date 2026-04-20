@@ -92,6 +92,24 @@ class BotVisibility_File_Generator {
     }
 
     /**
+     * Generate api-catalog content (RFC 9727 linkset).
+     */
+    private static function generate_api_catalog( $options ) {
+        ob_start();
+        include BOTVIS_PLUGIN_DIR . 'templates/api-catalog.php';
+        return ob_get_clean();
+    }
+
+    /**
+     * Generate oauth-protected-resource content (RFC 9728).
+     */
+    private static function generate_oauth_resource( $options ) {
+        ob_start();
+        include BOTVIS_PLUGIN_DIR . 'templates/oauth-protected-resource.php';
+        return ob_get_clean();
+    }
+
+    /**
      * Export a file to a static location.
      *
      * @param string $key File key.
@@ -104,14 +122,16 @@ class BotVisibility_File_Generator {
         }
 
         $path_map = array(
-            'llms-txt'       => 'llms.txt',
-            'agent-card'     => '.well-known/agent-card.json',
-            'ai-json'        => '.well-known/ai.json',
-            'skills-index'   => '.well-known/skills/index.json',
-            'skill-md'       => 'skill.md',
-            'openapi'        => 'openapi.json',
-            'mcp-json'       => '.well-known/mcp.json',
-            'openid-config'  => '.well-known/openid-configuration',
+            'llms-txt'        => 'llms.txt',
+            'agent-card'      => '.well-known/agent-card.json',
+            'ai-json'         => '.well-known/ai.json',
+            'skills-index'    => '.well-known/skills/index.json',
+            'skill-md'        => 'skill.md',
+            'openapi'         => 'openapi.json',
+            'mcp-json'        => '.well-known/mcp.json',
+            'openid-config'   => '.well-known/openid-configuration',
+            'api-catalog'     => '.well-known/api-catalog',
+            'oauth-resource'  => '.well-known/oauth-protected-resource',
         );
 
         $relative = $path_map[ $key ] ?? '';
@@ -153,6 +173,8 @@ class BotVisibility_File_Generator {
             '.well-known/skills/index.json',
             '.well-known/mcp.json',
             '.well-known/openid-configuration',
+            '.well-known/api-catalog',
+            '.well-known/oauth-protected-resource',
         );
 
         foreach ( $files as $file ) {

@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class BotVisibility_Scanner {
 
     /**
-     * Run all 37 checks and return results.
+     * Run all 43 checks and return results.
      *
      * @return array {
      *   checks: array of check results,
@@ -33,6 +33,10 @@ class BotVisibility_Scanner {
         $checks[] = self::check_mcp_server();
         $checks[] = self::check_token_efficiency();
         $checks[] = self::check_rss_feed();
+        $checks[] = self::check_content_signals();
+        $checks[] = self::check_api_catalog();
+        $checks[] = self::check_markdown_for_agents();
+        $checks[] = self::check_webmcp();
 
         // L2 checks.
         $checks[] = self::check_api_read_ops();
@@ -44,6 +48,8 @@ class BotVisibility_Scanner {
         $checks[] = self::check_structured_errors();
         $checks[] = self::check_async_ops();
         $checks[] = self::check_idempotency();
+        $checks[] = self::check_oauth_protected_resource();
+        $checks[] = self::check_x402_payments();
 
         // L3 checks.
         $checks[] = self::check_sparse_fields();
@@ -136,13 +142,15 @@ class BotVisibility_Scanner {
         $options       = get_option( 'botvisibility_options', array() );
         $enabled_files = $options['enabled_files'] ?? array();
         $file_key_map  = array(
-            'llms.txt'                          => 'llms-txt',
-            '.well-known/agent-card.json'       => 'agent-card',
-            '.well-known/ai.json'               => 'ai-json',
-            '.well-known/skills/index.json'     => 'skills-index',
-            'skill.md'                          => 'skill-md',
-            'openapi.json'                      => 'openapi',
-            '.well-known/mcp.json'              => 'mcp-json',
+            'llms.txt'                                  => 'llms-txt',
+            '.well-known/agent-card.json'               => 'agent-card',
+            '.well-known/ai.json'                       => 'ai-json',
+            '.well-known/skills/index.json'             => 'skills-index',
+            'skill.md'                                  => 'skill-md',
+            'openapi.json'                              => 'openapi',
+            '.well-known/mcp.json'                      => 'mcp-json',
+            '.well-known/api-catalog'                   => 'api-catalog',
+            '.well-known/oauth-protected-resource'      => 'oauth-resource',
         );
 
         $key = $file_key_map[ ltrim( $relative_path, '/' ) ] ?? '';
@@ -664,6 +672,203 @@ class BotVisibility_Scanner {
         );
     }
 
+    /**
+     * 1.15 Content Signals (contentsignals.org) — robots.txt Content-Signal directive.
+     */
+    private static function check_content_signals() {
+        $robots_path = ABSPATH . 'robots.txt';
+        $content     = '';
+
+        if ( file_exists( $robots_path ) ) {
+            $content = file_get_contents( $robots_path );
+        } else {
+            $response = self::self_fetch( '/robots.txt' );
+            if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+                $content = wp_remote_retrieve_body( $response );
+            }
+        }
+
+        if ( empty( $content ) ) {
+            return self::result( '1.15', 'Content Signals', 1, 'Discoverable', 'fail',
+                'No robots.txt found',
+                '',
+                'Create a robots.txt file. WordPress generates one virtually by default.'
+            );
+        }
+
+        if ( ! preg_match( '/^\s*Content-Signal:\s*(.+)$/mi', $content, $m ) ) {
+            return self::result( '1.15', 'Content Signals', 1, 'Discoverable', 'fail',
+                'No Content-Signal directive in robots.txt',
+                'See contentsignals.org for the specification.',
+                'Configure Content Signals in BotVisibility settings (search, ai-train, ai-input).'
+            );
+        }
+
+        $directive = trim( $m[1] );
+        $found     = array();
+        foreach ( array( 'search', 'ai-train', 'ai-input' ) as $key ) {
+            if ( preg_match( '/\b' . preg_quote( $key, '/' ) . '\s*=\s*(yes|no)\b/i', $directive ) ) {
+                $found[] = $key;
+            }
+        }
+
+        if ( count( $found ) >= 2 ) {
+            return self::result( '1.15', 'Content Signals', 1, 'Discoverable', 'pass',
+                'Content-Signal directive present with multiple tokens',
+                sprintf( 'Tokens: %s', implode( ', ', $found ) ),
+                '', home_url( '/robots.txt' )
+            );
+        }
+
+        if ( count( $found ) >= 1 ) {
+            return self::result( '1.15', 'Content Signals', 1, 'Discoverable', 'partial',
+                'Content-Signal directive present but limited',
+                sprintf( 'Only tokens: %s', implode( ', ', $found ) ),
+                'Add search, ai-train, and ai-input tokens for a complete signal.'
+            );
+        }
+
+        return self::result( '1.15', 'Content Signals', 1, 'Discoverable', 'partial',
+            'Content-Signal directive present but uses no recognized tokens',
+            sprintf( 'Directive: %s', $directive ),
+            'Use tokens: search=yes|no, ai-train=yes|no, ai-input=yes|no.'
+        );
+    }
+
+    /**
+     * 1.16 API Catalog (RFC 9727 linkset at /.well-known/api-catalog).
+     */
+    private static function check_api_catalog() {
+        $info = self::file_exists_or_virtual( '.well-known/api-catalog' );
+
+        if ( ! $info['exists'] ) {
+            return self::result( '1.16', 'API Catalog', 1, 'Discoverable', 'fail',
+                'No API catalog found',
+                'Checked /.well-known/api-catalog',
+                'Use the Fix button to auto-generate an API catalog linkset.'
+            );
+        }
+
+        $data = json_decode( $info['content'], true );
+        $link = $data['linkset'][0] ?? null;
+
+        if ( ! is_array( $link ) || empty( $link['service-desc'] ) ) {
+            return self::result( '1.16', 'API Catalog', 1, 'Discoverable', 'partial',
+                'API catalog found but missing service-desc links',
+                'linkset[0].service-desc is empty',
+                'Enable the OpenAPI spec so the catalog can link to it.'
+            );
+        }
+
+        $service_desc = $link['service-desc'][0]['href'] ?? '';
+
+        return self::result( '1.16', 'API Catalog', 1, 'Discoverable', 'pass',
+            'API catalog linkset found with service-desc',
+            sprintf( 'service-desc: %s (%s)', $service_desc, $info['type'] ),
+            '', home_url( '/.well-known/api-catalog' )
+        );
+    }
+
+    /**
+     * 1.17 Markdown for Agents — Accept: text/markdown returns markdown.
+     */
+    private static function check_markdown_for_agents() {
+        // Find a post URL to probe (markdown rendering is for singular posts/pages).
+        $posts = get_posts( array(
+            'numberposts' => 1,
+            'post_status' => 'publish',
+            'post_type'   => array( 'post', 'page' ),
+        ) );
+
+        if ( empty( $posts ) ) {
+            return self::result( '1.17', 'Markdown for Agents', 1, 'Discoverable', 'na',
+                'No published posts or pages to test against',
+                'Publish at least one post or page, then rescan.', ''
+            );
+        }
+
+        $target = get_permalink( $posts[0] );
+
+        $response = wp_remote_get( $target, array(
+            'timeout'   => 10,
+            'sslverify' => false,
+            'headers'   => array( 'Accept' => 'text/markdown' ),
+            'user-agent' => 'BotVisibility/1.0 (self-scan)',
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            return self::result( '1.17', 'Markdown for Agents', 1, 'Discoverable', 'fail',
+                'Could not fetch sample post', $response->get_error_message()
+            );
+        }
+
+        $content_type = wp_remote_retrieve_header( $response, 'content-type' );
+        $body         = wp_remote_retrieve_body( $response );
+
+        if ( stripos( $content_type, 'text/markdown' ) === false ) {
+            return self::result( '1.17', 'Markdown for Agents', 1, 'Discoverable', 'fail',
+                'Server returned HTML, not markdown',
+                sprintf( 'Content-Type: %s', $content_type ?: '(none)' ),
+                'Enable "Markdown for Agents" in BotVisibility settings.'
+            );
+        }
+
+        $is_markdown_shaped = ( strpos( $body, '# ' ) !== false ) || ( strpos( $body, '---' ) === 0 );
+
+        if ( ! $is_markdown_shaped ) {
+            return self::result( '1.17', 'Markdown for Agents', 1, 'Discoverable', 'partial',
+                'Markdown content type returned but body does not look like markdown',
+                sprintf( '%d chars returned', strlen( $body ) ),
+                'Verify the markdown converter output.'
+            );
+        }
+
+        return self::result( '1.17', 'Markdown for Agents', 1, 'Discoverable', 'pass',
+            'Markdown rendering served for Accept: text/markdown',
+            sprintf( 'Content-Type: %s, %d chars', $content_type, strlen( $body ) ),
+            '', $target
+        );
+    }
+
+    /**
+     * 1.18 WebMCP — homepage calls navigator.modelContext.provideContext().
+     */
+    private static function check_webmcp() {
+        $response = self::self_fetch( '/' );
+
+        if ( is_wp_error( $response ) ) {
+            return self::result( '1.18', 'WebMCP', 1, 'Discoverable', 'fail',
+                'Could not fetch homepage', $response->get_error_message()
+            );
+        }
+
+        $html = wp_remote_retrieve_body( $response );
+
+        if ( ! preg_match( '/navigator\.modelContext\.provideContext\s*\(/', $html ) ) {
+            return self::result( '1.18', 'WebMCP', 1, 'Discoverable', 'fail',
+                'No WebMCP script found on homepage',
+                'Expected navigator.modelContext.provideContext() call.',
+                'Enable WebMCP in BotVisibility settings to inject the script.'
+            );
+        }
+
+        $has_tools = preg_match( '/"tools"\s*:/', $html );
+
+        if ( ! $has_tools ) {
+            return self::result( '1.18', 'WebMCP', 1, 'Discoverable', 'partial',
+                'WebMCP call present but no tools declared',
+                'Homepage includes navigator.modelContext.provideContext() but the tools array is missing.',
+                'Regenerate WebMCP output from BotVisibility settings.'
+            );
+        }
+
+        return self::result( '1.18', 'WebMCP', 1, 'Discoverable', 'pass',
+            'WebMCP context provider found on homepage',
+            'navigator.modelContext.provideContext() call detected with tools array.',
+            '', home_url( '/' )
+        );
+    }
+
     // ========================================
     // L2: USABLE CHECKS
     // ========================================
@@ -1030,6 +1235,105 @@ class BotVisibility_Scanner {
         return self::result( '2.9', 'Idempotency Support', 2, 'Usable', 'fail',
             'No idempotency key support found', '',
             'Enable idempotency support in BotVisibility settings.'
+        );
+    }
+
+    /**
+     * 2.10 OAuth Protected Resource (RFC 9728).
+     */
+    private static function check_oauth_protected_resource() {
+        $info = self::file_exists_or_virtual( '.well-known/oauth-protected-resource' );
+
+        if ( ! $info['exists'] ) {
+            return self::result( '2.10', 'OAuth Protected Resource', 2, 'Usable', 'fail',
+                'No OAuth Protected Resource document found',
+                'Checked /.well-known/oauth-protected-resource',
+                'Use the Fix button to auto-generate the RFC 9728 document.'
+            );
+        }
+
+        $data = json_decode( $info['content'], true );
+
+        if ( ! is_array( $data ) || empty( $data['resource'] ) || empty( $data['authorization_servers'] ) ) {
+            return self::result( '2.10', 'OAuth Protected Resource', 2, 'Usable', 'partial',
+                'Document exists but missing required fields',
+                'Must include: resource, authorization_servers',
+                'Regenerate the OAuth Protected Resource document.'
+            );
+        }
+
+        return self::result( '2.10', 'OAuth Protected Resource', 2, 'Usable', 'pass',
+            'OAuth Protected Resource document found',
+            sprintf( 'resource: %s (%s)', $data['resource'], $info['type'] ),
+            '', home_url( '/.well-known/oauth-protected-resource' )
+        );
+    }
+
+    /**
+     * 2.11 x402 Payments — HTTP 402 + machine-readable payment requirements.
+     */
+    private static function check_x402_payments() {
+        $url = rest_url( BotVisibility_X402::ROUTE_NS . BotVisibility_X402::ROUTE_PATH );
+
+        $response = wp_remote_get( $url, array(
+            'timeout'    => 10,
+            'sslverify'  => false,
+            'user-agent' => 'BotVisibility/1.0 (self-scan)',
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            return self::result( '2.11', 'x402 Payments', 2, 'Usable', 'fail',
+                'Could not reach x402 endpoint', $response->get_error_message(),
+                'Enable "x402 Payments" in BotVisibility settings.'
+            );
+        }
+
+        $status = wp_remote_retrieve_response_code( $response );
+        $body   = wp_remote_retrieve_body( $response );
+
+        if ( 404 === $status ) {
+            return self::result( '2.11', 'x402 Payments', 2, 'Usable', 'fail',
+                'x402 endpoint is not enabled',
+                sprintf( 'GET %s returned 404', $url ),
+                'Enable "x402 Payments" in BotVisibility settings.'
+            );
+        }
+
+        if ( 402 !== $status ) {
+            return self::result( '2.11', 'x402 Payments', 2, 'Usable', 'fail',
+                'x402 endpoint did not return HTTP 402',
+                sprintf( 'GET %s returned %d', $url, $status )
+            );
+        }
+
+        $data = json_decode( $body, true );
+        if ( ! is_array( $data ) || empty( $data['accepts'] ) || ! is_array( $data['accepts'] ) ) {
+            return self::result( '2.11', 'x402 Payments', 2, 'Usable', 'partial',
+                '402 returned but body is not a valid x402 payment requirements payload',
+                'Expected { x402Version, accepts: [...] }'
+            );
+        }
+
+        $first = $data['accepts'][0] ?? array();
+        $missing = array();
+        foreach ( array( 'scheme', 'network', 'maxAmountRequired', 'asset' ) as $required ) {
+            if ( empty( $first[ $required ] ) ) {
+                $missing[] = $required;
+            }
+        }
+
+        if ( $missing ) {
+            return self::result( '2.11', 'x402 Payments', 2, 'Usable', 'partial',
+                'x402 payload missing required fields',
+                'Missing: ' . implode( ', ', $missing ),
+                'Configure x402 in BotVisibility settings.'
+            );
+        }
+
+        return self::result( '2.11', 'x402 Payments', 2, 'Usable', 'pass',
+            'x402 endpoint returns 402 with payment requirements',
+            sprintf( 'scheme: %s, network: %s, asset: %s', $first['scheme'], $first['network'], $first['asset'] ),
+            '', $url
         );
     }
 

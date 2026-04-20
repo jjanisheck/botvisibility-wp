@@ -27,8 +27,8 @@ class Test_Scoring extends BotVis_Test_Case {
     //  CHECK_DEFINITIONS constant
     // ──────────────────────────────────────────────────────────────
 
-    public function test_check_definitions_has_37_entries() {
-        $this->assertCount( 37, BotVisibility_Scoring::CHECK_DEFINITIONS );
+    public function test_check_definitions_has_43_entries() {
+        $this->assertCount( 43, BotVisibility_Scoring::CHECK_DEFINITIONS );
     }
 
     public function test_check_definitions_cover_all_levels() {
@@ -36,10 +36,17 @@ class Test_Scoring extends BotVis_Test_Case {
         foreach ( BotVisibility_Scoring::CHECK_DEFINITIONS as $def ) {
             $by_level[ $def['level'] ]++;
         }
-        $this->assertSame( 14, $by_level[1] );
-        $this->assertSame( 9,  $by_level[2] );
+        $this->assertSame( 18, $by_level[1] );
+        $this->assertSame( 11, $by_level[2] );
         $this->assertSame( 7,  $by_level[3] );
         $this->assertSame( 7,  $by_level[4] );
+    }
+
+    public function test_new_checks_present() {
+        $ids = array_column( BotVisibility_Scoring::CHECK_DEFINITIONS, 'id' );
+        foreach ( array( '1.15', '1.16', '1.17', '1.18', '2.10', '2.11' ) as $new_id ) {
+            $this->assertContains( $new_id, $ids, "Missing check $new_id" );
+        }
     }
 
     // ──────────────────────────────────────────────────────────────

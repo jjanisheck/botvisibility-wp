@@ -19,6 +19,8 @@ class BotVisibility_Virtual_Routes {
         add_rewrite_rule( '^\.well-known/skills/index\.json$', 'index.php?botvis_file=skills-index', 'top' );
         add_rewrite_rule( '^\.well-known/mcp\.json$', 'index.php?botvis_file=mcp-json', 'top' );
         add_rewrite_rule( '^\.well-known/openid-configuration$', 'index.php?botvis_file=openid-config', 'top' );
+        add_rewrite_rule( '^\.well-known/api-catalog$', 'index.php?botvis_file=api-catalog', 'top' );
+        add_rewrite_rule( '^\.well-known/oauth-protected-resource$', 'index.php?botvis_file=oauth-resource', 'top' );
 
         add_filter( 'query_vars', array( __CLASS__, 'add_query_vars' ) );
     }
@@ -54,14 +56,16 @@ class BotVisibility_Virtual_Routes {
 
         // Check if static file exists and should take precedence.
         $static_paths = array(
-            'llms-txt'       => 'llms.txt',
-            'agent-card'     => '.well-known/agent-card.json',
-            'ai-json'        => '.well-known/ai.json',
-            'skills-index'   => '.well-known/skills/index.json',
-            'skill-md'       => 'skill.md',
-            'openapi'        => 'openapi.json',
-            'mcp-json'       => '.well-known/mcp.json',
-            'openid-config'  => '.well-known/openid-configuration',
+            'llms-txt'        => 'llms.txt',
+            'agent-card'      => '.well-known/agent-card.json',
+            'ai-json'         => '.well-known/ai.json',
+            'skills-index'    => '.well-known/skills/index.json',
+            'skill-md'        => 'skill.md',
+            'openapi'         => 'openapi.json',
+            'mcp-json'        => '.well-known/mcp.json',
+            'openid-config'   => '.well-known/openid-configuration',
+            'api-catalog'     => '.well-known/api-catalog',
+            'oauth-resource'  => '.well-known/oauth-protected-resource',
         );
 
         $relative = $static_paths[ $file_key ] ?? '';
@@ -86,14 +90,16 @@ class BotVisibility_Virtual_Routes {
 
         // Set appropriate content type.
         $content_types = array(
-            'llms-txt'      => 'text/plain; charset=utf-8',
-            'agent-card'    => 'application/json; charset=utf-8',
-            'ai-json'       => 'application/json; charset=utf-8',
-            'skills-index'  => 'application/json; charset=utf-8',
-            'skill-md'      => 'text/markdown; charset=utf-8',
-            'openapi'       => 'application/json; charset=utf-8',
-            'mcp-json'      => 'application/json; charset=utf-8',
-            'openid-config' => 'application/json; charset=utf-8',
+            'llms-txt'        => 'text/plain; charset=utf-8',
+            'agent-card'      => 'application/json; charset=utf-8',
+            'ai-json'         => 'application/json; charset=utf-8',
+            'skills-index'    => 'application/json; charset=utf-8',
+            'skill-md'        => 'text/markdown; charset=utf-8',
+            'openapi'         => 'application/json; charset=utf-8',
+            'mcp-json'        => 'application/json; charset=utf-8',
+            'openid-config'   => 'application/json; charset=utf-8',
+            'api-catalog'     => 'application/linkset+json; charset=utf-8',
+            'oauth-resource'  => 'application/json; charset=utf-8',
         );
 
         $content_type = $content_types[ $file_key ] ?? 'text/plain; charset=utf-8';
